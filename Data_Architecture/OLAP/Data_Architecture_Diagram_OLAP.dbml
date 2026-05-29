@@ -1,0 +1,136 @@
+Table fact_transaction {
+  transaction_key integer [primary key]
+  time_key integer
+  customer_key integer
+  merchant_key integer
+  geography_key integer
+  payment_key integer
+  transaction_amount decimal 
+  is_fraud boolean
+  is_refunded boolean
+  is_successful boolean
+}
+
+Table fact_fraud {
+  fraud_key integer [primary key]
+  time_key integer 
+  customer_key integer
+  merchant_key integer
+  geography_key integer
+  payment_key integer
+  anomaly_score decimal
+  is_confirmed boolean 
+  fraud_amount decimal 
+  fraud_type varchar [note: 'stolen_card, chargeback, account_takeover, card_testing, friendly_fraud']
+}
+
+Table fact_compliance {
+  compliance_key integer [primary key]
+  time_key integer
+  geography_key integer
+  event_type varchar [note: 'data_access, data_export, data_modification, login_attempt, permission_change']
+  regulation varchar [note: 'RGPD, PCI-DSS, CCPA']
+  is_violation boolean 
+  severity varchar
+}
+
+Table dim_time {
+  time_key integer [primary key]
+  date date [not null]
+  day integer [not null]
+  month integer [not null]
+  year integer [not null]
+  quarter integer [not null]
+  day_of_week integer [not null]
+  is_weekday boolean [not null]
+  week_of_year integer [not null]
+}
+
+Table dim_customer {
+  customer_key integer [primary key]
+  name varchar 
+  country varchar 
+  continent varchar
+  is_new_customer boolean 
+  activity_status varchar 
+  customer_segment varchar 
+  first_transaction_date date 
+  last_transaction_date date 
+}
+
+Table dim_merchant {
+  merchant_key integer [primary key]
+  name varchar 
+  country varchar 
+  industry_sector varchar
+  status varchar [note: 'active, inactive, suspended']
+  registration_date date 
+  merchant_tier varchar [note: 'small, medium, large']
+}
+
+Table dim_geography {
+  geography_key integer [primary key]
+  country varchar
+  continent varchar 
+  city varchar 
+  zip_code varchar
+  timezone varchar
+}
+
+Table dim_payment_method {
+  payment_key integer [primary key]
+  payment_type varchar 
+  card_network varchar
+  wallet_type varchar 
+}
+
+Table summary_daily_revenue {
+  date date [primary key]
+  transaction_count integer 
+  total_revenue decimal 
+  avg_transaction_amount decimal 
+  failed_count integer
+  fraud_count integer
+}
+
+Table summary_fraud_by_country {
+  country varchar
+  date date
+  fraud_count integer 
+  total_fraud_amount decimal
+  fraud_rate decimal
+
+  indexes {
+    (country, date) [pk]
+  }
+}
+
+Table summary_merchant_performance {
+  merchant_key integer 
+  date date 
+  total_revenue decimal 
+  transaction_count integer 
+  refund_rate decimal 
+  fraud_rate decimal
+
+  indexes {
+    (merchant_key, date) [pk]
+  }
+}
+
+Ref: fact_transaction.customer_key > dim_customer.customer_key
+Ref: fact_transaction.geography_key > dim_geography.geography_key
+Ref: fact_transaction.merchant_key > dim_merchant.merchant_key
+Ref: fact_transaction.payment_key > dim_payment_method.payment_key
+Ref: fact_transaction.time_key > dim_time.time_key
+
+Ref: fact_fraud.customer_key > dim_customer.customer_key
+Ref: fact_fraud.geography_key > dim_geography.geography_key
+Ref: fact_fraud.merchant_key > dim_merchant.merchant_key
+Ref: fact_fraud.payment_key > dim_payment_method.payment_key
+Ref: fact_fraud.time_key > dim_time.time_key
+
+Ref: fact_compliance.geography_key > dim_geography.geography_key
+Ref: fact_compliance.time_key > dim_time.time_key
+
+Ref: summary_merchant_performance.merchant_key > dim_merchant.merchant_key

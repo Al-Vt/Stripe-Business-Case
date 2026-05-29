@@ -1,0 +1,123 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table Customers {
+  customer_ID integer [primary key]
+  name varchar [not null]
+  email varchar [not null]
+  data_of_creation timestamp
+  country_code varchar
+}
+
+Table Merchants {
+ merchant_ID integer [primary key]
+ company_name varchar [not null]
+ country_code varchar
+ industry_sector varchar
+}
+
+Table Transactions {
+ transaction_ID integer [primary key]
+ payment_method_ID integer [not null]
+ customer_ID integer [not null]
+ merchant_ID integer [not null]
+ transaction_amount decimal [not null]
+ currency_code varchar [not null]
+ transaction_date_time timestamp [not null]
+ location varchar
+ device_type varchar
+ Status varchar [not null]
+}
+
+Table Payment_Methods {
+ payment_method_ID integer [primary key]
+ customer_ID integer [not null]
+ type varchar // 'card', 'bank_transfer', 'wallet' 
+ created_at timestamp
+}
+
+Table Payment_Card {
+  payment_method_ID integer [primary key, ref: - Payment_Methods.payment_method_ID]
+  expiry_date timestamp [not null]
+  card_token varchar [not null]
+  card_holder_name varchar [not null]
+}
+
+Table Bank_Transfer {
+  payment_method_ID integer [primary key, ref: - Payment_Methods.payment_method_ID]
+  bank_holder_name varchar [not null]
+  bank_account_token varchar [not null]
+  iban_last4 varchar [not null]
+  bic varchar [not null]
+}
+
+Table Wallet {
+  payment_method_ID integer [primary key, ref: - Payment_Methods.payment_method_ID]
+  device_token varchar [not null]
+  wallet_type varchar [not null]
+}
+
+Table Frauds {
+  fraud_ID integer [primary key]
+  transaction_ID integer [not null]
+  anomaly_score decimal
+  type_fraude varchar [note: 'stolen_card, chargeback, account_takeover, card_testing, friendly_fraud']
+  is_fraud boolean [not null]
+}
+
+Table Refunds {
+  refund_ID integer [primary key]
+  transaction_ID integer [not null]
+  amount decimal [not null, note: 'must be <= transaction amount']
+}
+
+table Chargebacks {
+  chargeback_ID integer [primary key]
+  transaction_ID integer [not null]
+  opened_at timestamp [not null]
+  deadline_at timestamp
+  status varchar [not null]
+  reason varchar
+  amount decimal [not null]
+}
+
+Table subscriptions {
+  subscription_ID integer [primary key]
+  customer_ID integer [not null]
+  merchant_ID integer [not null]
+  payment_method_ID integer
+  amount decimal
+  frequency varchar [not null]
+  start_time timestamp [not null]
+  end_time timestamp 
+  status varchar [not null]
+}
+
+table Currencies {
+  currency_code varchar [primary key]
+  name varchar [not null]
+  exchange_rate decimal [not null, note: 'Relative to USD']
+}
+
+Table countries {
+  country_code varchar [primary key]
+  name varchar 
+  continent varchar
+  currency_code varchar
+  regulations varchar [note: 'GDPR, PCI-DSS, CCPA']
+}
+//
+Ref: Transactions.customer_ID > Customers.customer_ID
+Ref: Transactions.merchant_ID > Merchants.merchant_ID
+Ref: Frauds.transaction_ID > Transactions.transaction_ID
+Ref: Payment_Methods.customer_ID > Customers.customer_ID
+Ref: Transactions.payment_method_ID > Payment_Methods.payment_method_ID
+Ref: Refunds.transaction_ID > Transactions.transaction_ID
+Ref: Chargebacks.transaction_ID > Transactions.transaction_ID
+Ref: subscriptions.customer_ID > Customers.customer_ID
+Ref: subscriptions.merchant_ID > Merchants.merchant_ID
+Ref: subscriptions.payment_method_ID > Payment_Methods.payment_method_ID
+Ref: Transactions.currency_code > Currencies.currency_code
+Ref: countries.currency_code > Currencies.currency_code
+Ref: Customers.country_code > countries.country_code
+Ref: Merchants.country_code > countries.country_code

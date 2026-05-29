@@ -1,0 +1,101 @@
+error_log 
+{
+   "transaction" : {
+    "transaction_id": "tra_123", 
+    "merchant_id": "mer_234" , 
+    "Customer_id": "cus_123"
+    },
+   "date" : {
+     "datetime": "2026-01-15T10:42:42", 
+     "day": 01, 
+     "month": 01, 
+     "year": 2026
+    },
+   "error" : {
+     "error_type": 500, 
+     "error_message": "Payment gateway timeout"
+    },
+   "server" : "payment-server-01",
+}
+
+user_interaction 
+{
+    "clickstream": [
+        {
+        "page": "checkout",
+        "order": 1,
+        "duration": 333,
+        "button_clicked": "pay_now"
+        },
+        {
+        "page": "payment",
+        "order": 2,
+        "duration": 333,
+        "button_clicked": "confirm"
+        },
+        {
+        "page": "confirmation",
+        "order": 3,
+        "duration": 333,
+        "button_clicked": null
+        }
+    ],
+    "session": {
+        "session_id" : "ses_123",
+        "customer_id": "cus_123",
+        "start": "2026-01-15T10:42:42",
+        "end": "2026-01-15T10:43:42",
+        "device": "mobile",
+        "ip_address": "123.456.1.1",
+        "transaction_id": "tra_123"
+    }
+}
+
+machine_learning_features 
+{
+    "transaction" : {
+        "amount" : 123.23,
+        "hour" : 23.22,
+        "country": "France",
+    },
+    "customer" : {
+        "number_transaction_last_24h" : 02,
+        "usual_customer_amount": 234.34,
+        "new_country": true,
+        "usual_amount" : 42.00
+    },
+    "device" : {
+        "type": "mobile",
+        "new_device": true,
+        "IP_address": "123.234.1.1",
+        "new_IP_address": true
+    }
+    
+}
+
+customer_feedback {
+    "customer" : {
+        "customer_id" : "cus_123",
+        "transaction_id" : "tr_123",
+        "merchant_id" : "mer_123",
+    },
+    "opinion" : {
+        "rating": 5,
+        "comment": "It was fast and easy to use",
+        "tags" : ["fast", "easy"]
+    }, 
+    "metadata" : {
+        "date" : "2026-01-15T10:42:42",
+        "type" : "review"
+    },
+    "survey": {
+        "survey_name": "Post-payment satisfaction",
+        "questions": [
+    {
+        "question": "How was your experience?",
+        "answer": "Very good"
+    }
+  ]
+}
+}
+
